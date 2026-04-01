@@ -25,6 +25,8 @@ function Login({ setUser }) {
           body: JSON.stringify({ username, password })
         }
       );
+      const data = await response.json();
+console.log("LOGIN RESPONSE:", data);
 
       const data = await response.json();
 
