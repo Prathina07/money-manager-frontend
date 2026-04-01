@@ -16,17 +16,26 @@ function ExpenseForm({ refreshExpenses }) {
       date
     };
 
-    await fetch("http://localhost:8080/expenses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(expense)
-    });
+    try {
+      const response = await fetch("https://money-manager-backend-1-dw8w.onrender.com/expenses", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(expense)
+});
 
-    alert("Expense added");
+      if (response.ok) {
+        alert("Expense added");
+        refreshExpenses();
+      } else {
+        alert("Failed to add expense");
+      }
 
-    refreshExpenses();
+    } catch (error) {
+      console.error(error);
+      alert("Server error");
+    }
   };
 
   return (

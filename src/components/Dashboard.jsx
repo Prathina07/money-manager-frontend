@@ -23,7 +23,8 @@ function Dashboard({ user, onLogout }) {
   const [date, setDate] = useState("");
   const [editId, setEditId] = useState(null);
 
-  const API = "http://localhost:8080/expenses";
+  // ✅ UPDATED BACKEND URL
+  const API = "https://money-manager-backend-1-dw8w.onrender.com/expenses";
 
   // FETCH
   const fetchExpenses = async () => {
@@ -39,11 +40,11 @@ function Dashboard({ user, onLogout }) {
     fetchExpenses();
   }, []);
 
-  // ✅ AI FUNCTION
+  // AI FUNCTION
   const getAIInsights = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:8080/ai/insights",
+        "https://money-manager-backend-1-dw8w.onrender.com/ai/insights",
         userData
       );
       setInsight(res.data);
@@ -183,12 +184,12 @@ function Dashboard({ user, onLogout }) {
           <Card title="Total Expense" value={expense} color="#dc2626" />
         </div>
 
-        {/* ✅ AI BUTTON */}
+        {/* AI BUTTON */}
         <button style={aiBtn} onClick={getAIInsights}>
           Generate AI Insights
         </button>
 
-        {/* ✅ AI OUTPUT */}
+        {/* AI OUTPUT */}
         {insight && (
           <div style={aiBox}>
             {insight}
