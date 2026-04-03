@@ -14,26 +14,28 @@ function Login({ setUser }) {
   }
 
   try {
-   const response = await fetch(
-  "https://money-manager-backend-1-dw8w.onrender.com/auth/login",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ username, password })
-  }
-);
+    const response = await fetch(
+      "https://money-manager-backend-1-dw8w.onrender.com/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      }
+    );
 
-if (!response.ok) {
-  const text = await response.text();
-  console.log("ERROR:", text);
-  alert(text);   // show real backend message
-  return;
-}
+    // ✅ read ONCE
+    const text = await response.text();
+    console.log("LOGIN RESPONSE:", text);
 
-    const data = await response.json(); // ✅ ONLY ONCE
-    console.log("LOGIN RESPONSE:", data);
+    if (!response.ok) {
+      alert(text);
+      return;
+    }
+
+    // ✅ parse manually
+    const data = JSON.parse(text);
 
     if (data && data.id) {
       alert("Login Successful");
