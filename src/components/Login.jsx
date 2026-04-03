@@ -7,43 +7,45 @@ function Login({ setUser }) {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+ const handleLogin = async () => {
+  if (!username || !password) {
+    alert("Fill all fields");
+    return;
+  }
 
-    if (!username || !password) {
-      alert("Fill all fields");
+  try {
+    const response = await fetch(
+      "https://money-manager-backend-1-dw8w.onrender.com/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      }
+    );
+
+    if (!response.ok) {
+      alert("Server error");
       return;
     }
 
-    try {
-      const response = await fetch(
-        "https://money-manager-backend-1-dw8w.onrender.com/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ username, password })
-        }
-      );
-      
+    const data = await response.json(); // ✅ ONLY ONCE
+    console.log("LOGIN RESPONSE:", data);
 
-      const data = await response.json();
-
-      // ✅ HANDLE LOGIN RESULT
-      if (data && data.id) {
-        alert("Login Successful");
-        setUser(data);       // store logged user
-        navigate("/dashboard");
-      } else {
-        alert("Invalid username or password");
-      }
-
-    } catch (error) {
-      console.error(error);
-      alert("Server error");
+    if (data && data.id) {
+      alert("Login Successful");
+      setUser(data);
+      navigate("/dashboard");
+    } else {
+      alert("Invalid username or password");
     }
-  };
 
+  } catch (error) {
+    console.error(error);
+    alert("Server error");
+  }
+};
   return (
     <div className="login-container">
       <div className="login-box">

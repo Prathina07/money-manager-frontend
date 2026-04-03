@@ -108,9 +108,9 @@ function Dashboard({ user, onLogout }) {
   };
 
   // FILTER USER
-  const userData = transactions.filter(
-    t => user?.id ? Number(t.userId) === Number(user.id) : true
-  );
+ const userData = user
+  ? transactions.filter(t => Number(t.userId) === Number(user.id))
+  : [];
 
   // CALCULATIONS
   const income = userData
@@ -133,7 +133,9 @@ function Dashboard({ user, onLogout }) {
       }
     ]
   };
-
+  if (!user) {
+  return <h2>Loading...</h2>;
+}
   return (
     <div style={container}>
 
