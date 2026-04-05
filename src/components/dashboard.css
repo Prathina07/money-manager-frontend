@@ -51,6 +51,14 @@
   border-left: 5px solid red;
 }
 
+.chart-box {
+  margin-top: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
 .form-box {
   margin-top: 20px;
   background: white;
@@ -59,6 +67,19 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.form-box input,
+.form-box select {
+  padding: 8px;
+}
+
+.form-box button {
+  background: #5a00d1;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
 }
 
 .transactions {
@@ -72,6 +93,15 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
+  align-items: center;
+}
+
+.transaction button {
+  background: red;
+  color: white;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
 }
 
 .green {

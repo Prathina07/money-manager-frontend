@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { PieChart, Pie, Cell } from "recharts";
 import "./dashboard.css";
 
 function Dashboard({ user, onLogout }) {
@@ -14,7 +15,7 @@ function Dashboard({ user, onLogout }) {
 
   const API_BASE = "https://money-manager-backend-1-dw8w.onrender.com";
 
-  // ✅ FETCH DATA
+  // FETCH
   const fetchExpenses = async () => {
     if (!user || !user.id) return;
 
@@ -33,9 +34,8 @@ function Dashboard({ user, onLogout }) {
     fetchExpenses();
   }, [user]);
 
-  // ✅ ADD EXPENSE
+  // ADD
   const addExpense = async () => {
-
     if (!title || !amount || !type || !category || !date) {
       alert("Fill all fields");
       return;
@@ -53,8 +53,6 @@ function Dashboard({ user, onLogout }) {
     try {
       await axios.post(`${API_BASE}/expenses`, data);
 
-      alert("Added successfully");
-
       setTitle("");
       setAmount("");
       setType("");
@@ -69,7 +67,18 @@ function Dashboard({ user, onLogout }) {
     }
   };
 
-  // calculations
+  // DELETE
+  const deleteExpense = async (id) => {
+    try {
+      await axios.delete(`${API_BASE}/expenses/${id}`);
+      fetchExpenses();
+    } catch (err) {
+      console.log(err);
+      alert("Delete failed");
+    }
+  };
+
+  // CALCULATIONS
   const income = transactions
     .filter(t => t.type === "Income")
     .reduce((a, b) => a + b.amount, 0);
@@ -79,6 +88,11 @@ function Dashboard({ user, onLogout }) {
     .reduce((a, b) => a + b.amount, 0);
 
   const balance = income - expense;
+
+  const chartData = [
+    { name: "Income", value: income },
+    { name: "Expense", value: expense },
+  ];
 
   if (!user) return <h2>Loading...</h2>;
 
@@ -115,22 +129,33 @@ function Dashboard({ user, onLogout }) {
           </div>
         </div>
 
+        {/* CHART */}
+        <div className="chart-box">
+          <h3>Financial Overview</h3>
+
+          <PieChart width={250} height={250}>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={100}
+              dataKey="value"
+            >
+              <Cell fill="#4CAF50" />
+              <Cell fill="#F44336" />
+            </Pie>
+          </PieChart>
+
+          <p>Total Balance: ₹{balance}</p>
+        </div>
+
         {/* FORM */}
         <div className="form-box">
           <h3>Add Transaction</h3>
 
-          <input
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-
-          <input
-            type="number"
-            placeholder="Amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
+          <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <input type="number" placeholder="Amount" value={amount} onChange={(e) => setAmount(e.target.value)} />
 
           <select value={type} onChange={(e) => setType(e.target.value)}>
             <option value="">Type</option>
@@ -138,17 +163,8 @@ function Dashboard({ user, onLogout }) {
             <option>Expense</option>
           </select>
 
-          <input
-            placeholder="Category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          />
-
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
+          <input placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
 
           <button onClick={addExpense}>Add</button>
         </div>
@@ -165,9 +181,12 @@ function Dashboard({ user, onLogout }) {
                 <span>{t.title}</span>
                 <span>{t.category}</span>
                 <span>{t.date}</span>
+
                 <span className={t.type === "Income" ? "green" : "red"}>
                   ₹{t.amount}
                 </span>
+
+                <button onClick={() => deleteExpense(t.id)}>❌</button>
               </div>
             ))
           )}
