@@ -11,14 +11,20 @@ function Dashboard({ user, onLogout }) {
   const [category, setCategory] = useState("");
   const [date, setDate] = useState("");
 
-  // ✅ USER-SPECIFIC API
-  const API = `https://money-manager-backend-1-dw8w.onrender.com/expenses/user/${user?.id}`;
+  const API_BASE = "https://money-manager-backend-1-dw8w.onrender.com";
 
   // ✅ FETCH EXPENSES
   const fetchExpenses = async () => {
+
+    if (!user || !user.id) return;
+
     try {
-      const res = await axios.get(API);
+      const res = await axios.get(
+        `${API_BASE}/expenses/user/${user.id}`
+      );
+
       setTransactions(res.data || []);
+
     } catch (err) {
       console.log("FETCH ERROR:", err);
 
@@ -27,13 +33,12 @@ function Dashboard({ user, onLogout }) {
       } else {
         alert("Server error: " + err.message);
       }
-
-      setTransactions([]);
     }
   };
 
+  // ✅ FIXED useEffect
   useEffect(() => {
-    if (user?.id) {
+    if (user && user.id) {
       fetchExpenses();
     }
   }, [user]);
@@ -52,14 +57,11 @@ function Dashboard({ user, onLogout }) {
       type,
       category,
       date,
-      userId: user?.id   // IMPORTANT
+      userId: user?.id
     };
 
     try {
-      await axios.post(
-        "https://money-manager-backend-1-dw8w.onrender.com/expenses",
-        data
-      );
+      await axios.post(`${API_BASE}/expenses`, data);
 
       alert("Expense added");
 
