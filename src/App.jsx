@@ -15,59 +15,11 @@ function App() {
     }
   }, []);
 
-  // ✅ LOGIN FUNCTION (FIXED)
-  const handleLogin = (username, password) => {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    const existingUser = users.find(
-      (u) =>
-        u.username === username.trim() &&
-        u.password === password.trim()
-    );
-
-    if (!existingUser) {
-      alert("Invalid username or password");
-      return false;
-    }
-
-    localStorage.setItem("user", JSON.stringify(existingUser));
-    setUser(existingUser);
-
-    return true; // ✅ VERY IMPORTANT
-  };
-
-  // ✅ REGISTER FUNCTION (FIXED)
-  const handleRegister = (username, password) => {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    const userExists = users.find(
-      (u) => u.username === username.trim()
-    );
-
-    if (userExists) {
-      alert("User already exists");
-      return false;
-    }
-
-    const newUser = {
-      username: username.trim(),
-      password: password.trim(),
-    };
-
-    users.push(newUser);
-
-    localStorage.setItem("users", JSON.stringify(users));
-    alert("Registration successful! Please login.");
-
-    return true; // ✅ VERY IMPORTANT
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
   };
 
-  // ✅ Protected Route
   const ProtectedRoute = ({ children }) => {
     return user ? children : <Navigate to="/login" />;
   };
@@ -76,11 +28,11 @@ function App() {
     <Routes>
       <Route
         path="/login"
-        element={<Login onLogin={handleLogin} />}
+        element={<Login setUser={setUser} />}
       />
       <Route
         path="/register"
-        element={<Register onRegister={handleRegister} />}
+        element={<Register />}
       />
       <Route
         path="/dashboard"

@@ -38,10 +38,14 @@ function Login({ setUser }) {
     const data = JSON.parse(text);
 
     if (data && data.id) {
-      alert("Login Successful");
-      setUser(data);
-      navigate("/dashboard");
-    } else {
+  alert("Login Successful");
+
+  setUser(data);
+  localStorage.setItem("user", JSON.stringify(data));
+
+  navigate("/dashboard");
+}
+     else {
       alert("Invalid username or password");
     }
 
