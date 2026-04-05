@@ -15,26 +15,30 @@ function Dashboard({ user, onLogout }) {
 
   // ✅ FETCH EXPENSES
   const fetchExpenses = async () => {
+  if (!user || !user.id) return;
 
-    if (!user || !user.id) return;
+  try {
+    console.log("CALLING API:", `${API_BASE}/expenses/user/${user.id}`);
 
-    try {
-      const res = await axios.get(
-        `${API_BASE}/expenses/user/${user.id}`
-      );
+    const res = await axios.get(
+      `${API_BASE}/expenses/user/${user.id}`
+    );
 
-      setTransactions(res.data || []);
+    console.log("SUCCESS RESPONSE:", res.data);
 
-    } catch (err) {
-      console.log("FETCH ERROR:", err);
+    setTransactions(res.data || []);
 
-      if (err.response) {
-        alert("Backend error: " + err.response.data);
-      } else {
-        alert("Server error: " + err.message);
-      }
+  } catch (err) {
+    console.log("FULL ERROR:", err);
+
+    if (err.response) {
+      console.log("ERROR RESPONSE:", err.response.data);
+      alert("Backend says: " + err.response.data);
+    } else {
+      alert("Network error: " + err.message);
     }
-  };
+  }
+};
 
   // ✅ FIXED useEffect
   useEffect(() => {
