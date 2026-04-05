@@ -9,41 +9,41 @@ function Register() {
 
   const handleSubmit = async () => {
 
-  if (!username || !password) {
-    alert("Fill all fields");
-    return;
-  }
-
-  const user = {
-    username,
-    password
-  };
-
-  try {
-
-    const response = await fetch(
-      "https://money-manager-backend-1-dw8w.onrender.com/auth/register",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(user)
-      }
-    );
-
-    if (response.ok) {
-      alert("User Registered Successfully");
-      navigate("/login");
-    } else {
-      alert("Registration failed");
+    if (!username || !password) {
+      alert("Fill all fields");
+      return;
     }
 
-  } catch (error) {
-    console.error(error);
-    alert("Server error");
-  }
-};
+    try {
+      const response = await fetch(
+        "https://money-manager-backend-1-dw8w.onrender.com/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ username, password })
+        }
+      );
+
+      // ✅ READ RESPONSE PROPERLY
+      const text = await response.text();
+      console.log("REGISTER RESPONSE:", text);
+
+      if (!response.ok) {
+        alert("Error: " + text);   // show backend error
+        return;
+      }
+
+      alert("User Registered Successfully");
+      navigate("/login");
+
+    } catch (error) {
+      console.error("FULL ERROR:", error);
+      alert("Server error: " + error.message); // show real error
+    }
+  };
+
   return (
     <div className="login-container">
       <div className="login-box">
