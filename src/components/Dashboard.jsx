@@ -1,153 +1,98 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { FaWallet, FaMoneyBillWave, FaChartPie } from "react-icons/fa";
+import "./dashboard.css";
 
 function Dashboard({ user, onLogout }) {
 
   const [transactions, setTransactions] = useState([]);
 
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [type, setType] = useState("");
-  const [category, setCategory] = useState("");
-  const [date, setDate] = useState("");
+  const API = `https://money-manager-backend-1-dw8w.onrender.com/expenses/user/${user?.id}`;
 
-  const API_BASE = "https://money-manager-backend-1-dw8w.onrender.com";
-
-  // ✅ FETCH EXPENSES
-  const fetchExpenses = async () => {
-  if (!user || !user.id) return;
-
-  try {
-    console.log("CALLING API:", `${API_BASE}/expenses/user/${user.id}`);
-
-    const res = await axios.get(
-      `${API_BASE}/expenses/user/${user.id}`
-    );
-
-    console.log("SUCCESS RESPONSE:", res.data);
-
-    setTransactions(res.data || []);
-
-  } catch (err) {
-    console.log("FULL ERROR:", err);
-
-    if (err.response) {
-      console.log("ERROR RESPONSE:", err.response.data);
-      alert("Backend says: " + err.response.data);
-    } else {
-      alert("Network error: " + err.message);
-    }
-  }
-};
-
-  // ✅ FIXED useEffect
   useEffect(() => {
-    if (user && user.id) {
+    if (user?.id) {
       fetchExpenses();
     }
   }, [user]);
 
-  // ✅ ADD EXPENSE
-  const addExpense = async () => {
-
-    if (!title || !amount || !type || !category || !date) {
-      alert("Fill all fields");
-      return;
-    }
-
-    const data = {
-      title,
-      amount: Number(amount),
-      type,
-      category,
-      date,
-      userId: user?.id
-    };
-
+  const fetchExpenses = async () => {
     try {
-      await axios.post(`${API_BASE}/expenses`, data);
-
-      alert("Expense added");
-
-      // reset form
-      setTitle("");
-      setAmount("");
-      setType("");
-      setCategory("");
-      setDate("");
-
-      fetchExpenses();
-
+      const res = await axios.get(API);
+      setTransactions(res.data || []);
     } catch (err) {
-      console.log("SAVE ERROR:", err);
-
-      if (err.response) {
-        alert("Backend error: " + err.response.data);
-      } else {
-        alert("Server error: " + err.message);
-      }
+      console.log(err);
     }
   };
 
-  if (!user) return <h2>Loading...</h2>;
+  // calculations
+  const income = transactions
+    .filter(t => t.type === "Income")
+    .reduce((acc, t) => acc + t.amount, 0);
+
+  const expense = transactions
+    .filter(t => t.type === "Expense")
+    .reduce((acc, t) => acc + t.amount, 0);
+
+  const balance = income - expense;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="dashboard">
 
-      <h2>Welcome, {user.username}</h2>
-      <button onClick={onLogout}>Logout</button>
+      {/* SIDEBAR */}
+      <div className="sidebar">
+        <h2>💰 Money Manager</h2>
+        <p>{user.username}</p>
 
-      {/* FORM */}
-      <div style={{ marginTop: "20px" }}>
-        <input
-          placeholder="Title"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
-
-        <input
-          type="number"
-          placeholder="Amount"
-          value={amount}
-          onChange={e => setAmount(e.target.value)}
-        />
-
-        <select value={type} onChange={e => setType(e.target.value)}>
-          <option value="">Type</option>
-          <option>Income</option>
-          <option>Expense</option>
-        </select>
-
-        <input
-          placeholder="Category"
-          value={category}
-          onChange={e => setCategory(e.target.value)}
-        />
-
-        <input
-          type="date"
-          value={date}
-          onChange={e => setDate(e.target.value)}
-        />
-
-        <button onClick={addExpense}>
-          Add Expense
-        </button>
+        <button className="active">Dashboard</button>
+        <button>Income</button>
+        <button>Expense</button>
+        <button onClick={onLogout}>Logout</button>
       </div>
 
-      {/* TRANSACTIONS */}
-      <div style={{ marginTop: "20px" }}>
-        <h3>Your Expenses</h3>
+      {/* MAIN */}
+      <div className="main">
 
-        {transactions.length === 0 ? (
-          <p>No expenses yet</p>
-        ) : (
-          transactions.map(t => (
-            <div key={t.id}>
-              {t.title} - ₹{t.amount} ({t.type})
-            </div>
-          ))
-        )}
+        {/* CARDS */}
+        <div className="cards">
+
+          <div className="card">
+            <FaWallet />
+            <h3>Total Balance</h3>
+            <p>₹{balance}</p>
+          </div>
+
+          <div className="card">
+            <FaMoneyBillWave />
+            <h3>Total Income</h3>
+            <p>₹{income}</p>
+          </div>
+
+          <div className="card red">
+            <FaChartPie />
+            <h3>Total Expense</h3>
+            <p>₹{expense}</p>
+          </div>
+
+        </div>
+
+        {/* TRANSACTIONS */}
+        <div className="transactions">
+          <h3>Recent Transactions</h3>
+
+          {transactions.length === 0 ? (
+            <p>No data</p>
+          ) : (
+            transactions.map(t => (
+              <div className="transaction" key={t.id}>
+                <span>{t.title}</span>
+                <span className={t.type === "Income" ? "green" : "red"}>
+                  ₹{t.amount}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+
       </div>
 
     </div>
